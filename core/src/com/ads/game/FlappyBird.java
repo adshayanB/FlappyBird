@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
+import java.util.Random;
+
 public class FlappyBird extends ApplicationAdapter {
 	SpriteBatch batch;
 	Texture background;
@@ -13,11 +15,25 @@ public class FlappyBird extends ApplicationAdapter {
 
 	float birdY =0;
 	float speed = 0;
-	float gravity =10;
+	float gravity =8;
 
 	int gameState;
 
 	int flapState = 0;
+
+	Texture topTube;
+	Texture bottomTube;
+	float gap = 400;
+	float maxTubespacing;
+
+	float tubespeed=16;
+
+	int  numberOfTubes =4;
+	float[] tubeX =new float [numberOfTubes];
+	float []tubespace =new float [numberOfTubes];
+	float distanceInbetween;
+
+	Random randValue;
 	
 	@Override
 	public void create () {
@@ -31,22 +47,56 @@ public class FlappyBird extends ApplicationAdapter {
 
 		birdY=Gdx.graphics.getHeight()/2-birds[0].getHeight()/2;
 
+		topTube= new Texture("toptube.png");
+		bottomTube= new Texture("bottomtube.png");
+		maxTubespacing =Gdx.graphics.getHeight()/2-gap/2-100;
+		randValue = new Random();
+
+		distanceInbetween = Gdx.graphics.getWidth()*3/4;
+
+		for (int i=0; i<numberOfTubes; i++){
+
+			tubespace[i]= (randValue.nextFloat()-0.5f)*(Gdx.graphics.getHeight()-gap-200);
+			tubeX[i]=Gdx.graphics.getWidth()/2-topTube.getWidth()/2+i*distanceInbetween;
+		}
+
+
 	}
 
 	@Override
 	public void render () {
-
+		batch.begin();
+		batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
 		if (gameState != 0) {
 
 
+
 			if (Gdx.input.justTouched()) {
-				speed = -50;
-				gameState = 1;
+				speed = -45;
+
+
 			}
 			if (birdY > 0 || speed < 0) {
 				speed = speed + gravity;
 				birdY -= speed;
+
+			}
+			for (int i=0; i<numberOfTubes; i++) {
+
+                   if(tubeX[i]<-topTube.getWidth()){
+
+                   	tubeX[i]+=numberOfTubes*distanceInbetween;
+
+				   }
+
+                   else {
+					   tubeX[i] = tubeX[i] - tubespeed;
+
+				   }
+				batch.draw(topTube, tubeX[i], Gdx.graphics.getHeight() / 2 + gap / 2 + tubespace[i]);
+
+				batch.draw(bottomTube, tubeX[i], Gdx.graphics.getHeight() / 2 - gap / 2 - bottomTube.getHeight() + tubespace[i]);
 
 			}
 
@@ -81,8 +131,7 @@ public class FlappyBird extends ApplicationAdapter {
 			}
 
 		}
-        batch.begin();
-        batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
         batch.draw(birds[flapState], Gdx.graphics.getWidth() / 2 - birds[flapState].getWidth() / 2, birdY);
 
         batch.end();
