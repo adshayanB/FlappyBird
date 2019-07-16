@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Circle;
@@ -17,12 +18,15 @@ public class FlappyBird extends ApplicationAdapter {
 	SpriteBatch batch;
 	Texture background;
 	Texture[] birds;
+	BitmapFont font;
 
 	float birdY =0;
 	float speed = 0;
 	float gravity =8;
 
 	int gameState;
+	int score=0;
+	int scoringTube=0;
 
 	int flapState = 0;
 
@@ -31,7 +35,7 @@ public class FlappyBird extends ApplicationAdapter {
 	float gap = 400;
 	float maxTubespacing;
 
-	float tubespeed=16;
+	float tubespeed=32;
 
 	int  numberOfTubes =4;
 	float[] tubeX =new float [numberOfTubes];
@@ -48,6 +52,9 @@ public class FlappyBird extends ApplicationAdapter {
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
+		font = new BitmapFont();
+		font.setColor(Color.WHITE);
+		font.getData().setScale(10);
 
 
 		background= new Texture("bg.png");
@@ -86,6 +93,21 @@ public class FlappyBird extends ApplicationAdapter {
 		batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
 		if (gameState != 0) {
+            if(tubeX[scoringTube]<Gdx.graphics.getWidth()/2){
+
+                    score++;
+
+                    Gdx.app.log("Score",String.valueOf(score));
+                    if(scoringTube<numberOfTubes-1){
+                        scoringTube++;
+
+                    }
+                    else{
+
+                        scoringTube =0;
+                    }
+
+            }
 
 
 
@@ -111,6 +133,7 @@ public class FlappyBird extends ApplicationAdapter {
 
                    else {
 					   tubeX[i] = tubeX[i] - tubespeed;
+
 
 				   }
 				batch.draw(topTube, tubeX[i], Gdx.graphics.getHeight() / 2 + gap / 2 + tubespace[i]);
@@ -158,9 +181,10 @@ public class FlappyBird extends ApplicationAdapter {
 
 
         batch.draw(birds[flapState], Gdx.graphics.getWidth() / 2 - birds[flapState].getWidth() / 2, birdY);
+      font.draw (batch, String.valueOf(score), 100,200);
 
-        batch.end();
 		bird.set(Gdx.graphics.getWidth()/2, birdY + birds[flapState].getHeight()/2, birds[flapState].getWidth()/2 );
+
 
 
 
@@ -175,8 +199,8 @@ public class FlappyBird extends ApplicationAdapter {
 			   }
 		}
 
+        batch.end();
 
-    
 	}
 	
 
