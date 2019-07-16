@@ -200,7 +200,6 @@ public class FlappyBird extends ApplicationAdapter {
 		}
 
         batch.end();
-
 	}
 	
 
