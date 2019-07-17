@@ -2,6 +2,7 @@ package com.ads.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -43,7 +44,11 @@ public class FlappyBird extends ApplicationAdapter {
 	float[] tubeX =new float [numberOfTubes];
 	float []tubespace =new float [numberOfTubes];
 	float distanceInbetween;
-
+ private Sound flap;
+ private Sound point;
+ private Sound hit;
+ 
+ int counter;
 	Circle bird;
 
 	Random randValue;
@@ -77,6 +82,12 @@ public class FlappyBird extends ApplicationAdapter {
 
 		distanceInbetween = Gdx.graphics.getWidth()*3/4;
 
+		flap = Gdx.audio.newSound(Gdx.files.internal("sfx_wing.ogg"));
+        point = Gdx.audio.newSound(Gdx.files.internal("sfx_point.ogg"));
+        hit = Gdx.audio.newSound(Gdx.files.internal("sfx_hit.ogg"));
+
+		counter=0;
+
 startGame();
 
 
@@ -105,6 +116,7 @@ public void startGame(){
             if(tubeX[scoringTube]<Gdx.graphics.getWidth()/2){
 
                     score++;
+                    point.play();
 
                     Gdx.app.log("Score",String.valueOf(score));
                     if(scoringTube<numberOfTubes-1){
@@ -122,6 +134,8 @@ public void startGame(){
 
 			if (Gdx.input.justTouched()) {
 				speed = -45;
+                 flap.play();
+
 
 
 			}
@@ -129,10 +143,15 @@ public void startGame(){
 				speed = speed + gravity;
 				birdY -= speed;
 
-			}else{
-gameState=2;
+			}else {
 
+				if (counter == 0) {
+					hit.play();
+					counter++;
+				}
+                gameState = 2;
 			}
+
 			for (int i=0; i<numberOfTubes; i++) {
 
                    if(tubeX[i]<-topTube.getWidth()){
@@ -171,7 +190,9 @@ gameState=2;
 		}
 	else if (gameState==2)
 		{
-			batch.draw(gameOver, Gdx.graphics.getWidth()/2-gameOver.getWidth()/2,Gdx.graphics.getHeight()/2-gameOver.getHeight()/2);
+			batch.draw(gameOver, Gdx.graphics.getWidth()/2-gameOver.getWidth()/2,Gdx.graphics.getHeight()/2+gameOver.getHeight()/2);
+
+
 
 
 			if (Gdx.input.justTouched()){
@@ -182,6 +203,8 @@ gameState=2;
 				score = 0;
 				scoringTube=0;
 				speed=0;
+				counter=0;
+
 
 			}
 
@@ -226,7 +249,14 @@ gameState=2;
 
 			   if(Intersector.overlaps(bird,topTubes[i])|| Intersector.overlaps(bird,bottomTubes[i])){
 
-			   	gameState=2;
+			       if (counter == 0) {
+                       hit.play();
+                       counter++;
+                   }
+
+                   gameState=2;
+
+
 			   }
 		}
 
