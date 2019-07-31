@@ -47,7 +47,7 @@ public class FlappyBird extends ApplicationAdapter {
  private Sound flap;
  private Sound point;
  private Sound hit;
- 
+
  int counter;
 	Circle bird;
 
